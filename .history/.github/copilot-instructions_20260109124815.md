@@ -1,4 +1,4 @@
-# Swift Engineering Project Guidelines
+# Swift Engineering Project
 
 ## Platform
 - iOS 26.0+, Swift 6.2, strict concurrency
@@ -53,7 +53,11 @@ Evaluate relevant skills in `.github/skills/`. State: `[skill-name] - YES/NO - [
 Evaluate if a specialized agent should handle this sub-task. State: `[agent-name] - YES/NO - [reason]`.
 
 ### Step 3: MCP Documentation Lookup
-If using modern Swift (2025) or Apple frameworks, search for latest documentation using the `sosumi` MCP server.
+If using modern Swift (2025) or Apple framewtools: codebase, search
+model: claude-sonnet-4
+mcp-servers:
+  - sosumi  # For Apple documentation lookup
+handoffs:cumentation using the `sosumi` MCP server.
 
 ### Step 4: Plan Execution
 Update `docs/plans/<feature>.md` before making any non-trivial code changes.
