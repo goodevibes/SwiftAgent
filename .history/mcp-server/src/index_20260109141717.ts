@@ -309,7 +309,6 @@ server.registerTool(
         description: 'Search the codebase for a pattern using ripgrep. Returns file paths, line numbers, and matching lines.',
         inputSchema: {
             pattern: z.string().describe('Search pattern (regex supported)'),
-            workspace: z.string().optional().describe('Path to workspace/project to search (defaults to current directory)'),
             path: z.string().optional().describe('Optional subdirectory to search in'),
             fileType: z.string().optional().describe('File extension filter (e.g., "swift", "ts")')
         },
@@ -322,13 +321,12 @@ server.registerTool(
             totalMatches: z.number()
         }
     },
-    async ({ pattern, workspace, path, fileType }) => {
+    async ({ pattern, path, fileType }) => {
         const { exec } = await import('child_process');
         const { promisify } = await import('util');
         const execAsync = promisify(exec);
         
-        const workspaceRoot = getWorkspace(workspace);
-        const searchPath = path ? join(workspaceRoot, path) : workspaceRoot;
+        const searchPath = path ? join(PROJECT_ROOT, path) : PROJECT_ROOT;
         
         // Build ripgrep command
         let cmd = `rg --json --max-count=50 "${pattern.replace(/"/g, '\\"')}" "${searchPath}"`;
@@ -339,8 +337,7 @@ server.registerTool(
         try {
             const { stdout } = await execAsync(cmd, {
                 timeout: 30000,
-                maxBuffer: 1024 * 1024 * 10,
-                env: SHELL_ENV
+                maxBuffer: 1024 * 1024 * 10 // 10MB
             });
             
             const matches: Array<{ file: string; line: number; content: string }> = [];
@@ -350,7 +347,7 @@ server.registerTool(
                     const json = JSON.parse(line);
                     if (json.type === 'match') {
                         matches.push({
-                            file: json.data.path.text.replace(workspaceRoot + '/', ''),
+                            file: json.data.path.text.replace(PROJECT_ROOT + '/', ''),
                             line: json.data.line_number,
                             content: json.data.lines.text.trim().slice(0, 200)
                         });
@@ -392,7 +389,6 @@ server.registerTool(
         title: 'Build Swift Project',
         description: 'Build the Xcode project using xcodebuild. Returns build status and any errors.',
         inputSchema: {
-            workspace: z.string().optional().describe('Path to Xcode project workspace'),
             scheme: z.string().optional().describe('Xcode scheme to build'),
             configuration: z.enum(['Debug', 'Release']).optional().default('Debug'),
             destination: z.string().optional().describe('Build destination (e.g., simulator UDID)')
@@ -403,12 +399,10 @@ server.registerTool(
             errors: z.array(z.string()).optional()
         }
     },
-    async ({ workspace, scheme, configuration, destination }) => {
+    async ({ scheme, configuration, destination }) => {
         const { exec } = await import('child_process');
         const { promisify } = await import('util');
         const execAsync = promisify(exec);
-        
-        const workspaceRoot = getWorkspace(workspace);
         
         let cmd = 'xcodebuild';
         if (scheme) cmd += ` -scheme "${scheme}"`;
@@ -418,10 +412,9 @@ server.registerTool(
         
         try {
             const { stdout } = await execAsync(cmd, {
-                cwd: workspaceRoot,
-                timeout: 300000,
-                maxBuffer: 1024 * 1024 * 50,
-                env: SHELL_ENV
+                cwd: PROJECT_ROOT,
+                timeout: 300000, // 5 minutes
+                maxBuffer: 1024 * 1024 * 50
             });
             
             const success = stdout.includes('BUILD SUCCEEDED');
@@ -452,7 +445,6 @@ server.registerTool(
         title: 'Run Swift Tests',
         description: 'Run Swift tests using xcodebuild test. Returns test results.',
         inputSchema: {
-            workspace: z.string().optional().describe('Path to Xcode project workspace'),
             scheme: z.string().optional().describe('Xcode scheme to test'),
             testPlan: z.string().optional().describe('Test plan to run'),
             destination: z.string().optional().describe('Test destination (simulator UDID)')
@@ -464,12 +456,10 @@ server.registerTool(
             output: z.string()
         }
     },
-    async ({ workspace, scheme, testPlan, destination }) => {
+    async ({ scheme, testPlan, destination }) => {
         const { exec } = await import('child_process');
         const { promisify } = await import('util');
         const execAsync = promisify(exec);
-        
-        const workspaceRoot = getWorkspace(workspace);
         
         let cmd = 'xcodebuild test';
         if (scheme) cmd += ` -scheme "${scheme}"`;
@@ -479,10 +469,9 @@ server.registerTool(
         
         try {
             const { stdout } = await execAsync(cmd, {
-                cwd: workspaceRoot,
-                timeout: 600000,
-                maxBuffer: 1024 * 1024 * 50,
-                env: SHELL_ENV
+                cwd: PROJECT_ROOT,
+                timeout: 600000, // 10 minutes
+                maxBuffer: 1024 * 1024 * 50
             });
             
             const success = stdout.includes('TEST SUCCEEDED') || stdout.includes('** TEST SUCCEEDED **');
@@ -631,7 +620,7 @@ ${body}
 // Dynamically register all agents and commands as MCP prompts
 // ============================================================================
 
-const PROMPTS_DIR = join(SWIFTAGENT_ROOT, '.github', 'prompts');
+const PROMPTS_DIR = join(PROJECT_ROOT, '.github', 'prompts');
 
 interface AgentMeta {
     name: string;
