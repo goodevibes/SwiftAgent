@@ -1,7 +1,7 @@
 {
-  "name": "swift-agent-mcp",
+  "name": "swift-zero-mcp",
   "version": "1.0.0",
-  "description": "SwiftAgent MCP Server - Access Swift engineering agents, skills, and tools from any IDE",
+  "description": "SwiftZero MCP Server - Access Swift engineering agents, skills, and tools from any IDE",
   "type": "module",
   "main": "dist/index.js",
   "bin": {

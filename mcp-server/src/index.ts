@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * SwiftAgent MCP Server
+ * SwiftZero MCP Server
  * 
  * Exposes Swift engineering agents, skills, and tools via the Model Context Protocol.
- * Run with: npx swift-agent-mcp or node dist/index.js
+ * Run with: npx swift-zero-mcp or node dist/index.js
  * Test with: npx @modelcontextprotocol/inspector
  */
 
@@ -17,13 +17,13 @@ import { readdir, readFile, stat } from 'fs/promises';
 // Resolve the project root (one level up from mcp-server/)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const SWIFTAGENT_ROOT = resolve(__dirname, '..', '..');
+const SWIFTZERO_ROOT = resolve(__dirname, '..', '..');
 
-// Paths to SwiftAgent resources (skills, agents, rules)
-const AGENTS_DIR = join(SWIFTAGENT_ROOT, '.github', 'agents');
-const SKILLS_DIR = join(SWIFTAGENT_ROOT, '.github', 'skills');
-const RULES_DIR = join(SWIFTAGENT_ROOT, 'rules');
-const SCRIPTS_DIR = join(SWIFTAGENT_ROOT, 'scripts');
+// Paths to SwiftZero resources (skills, agents, rules)
+const AGENTS_DIR = join(SWIFTZERO_ROOT, '.github', 'agents');
+const SKILLS_DIR = join(SWIFTZERO_ROOT, '.github', 'skills');
+const RULES_DIR = join(SWIFTZERO_ROOT, 'rules');
+const SCRIPTS_DIR = join(SWIFTZERO_ROOT, 'scripts');
 
 // Environment with Homebrew paths for tools like ripgrep
 const SHELL_ENV = {
@@ -39,7 +39,7 @@ function getWorkspace(workspacePath?: string): string {
 
 // Initialize the MCP Server
 const server = new McpServer({
-    name: 'swift-agent',
+    name: 'swift-zero',
     version: '1.0.0'
 });
 
@@ -50,8 +50,8 @@ const server = new McpServer({
 server.registerTool(
     'list_resources',
     {
-        title: 'List SwiftAgent Resources',
-        description: 'List all available agents, skills, and rules in SwiftAgent. Use this to discover what resources are available before loading them.',
+        title: 'List SwiftZero Resources',
+        description: 'List all available agents, skills, and rules in SwiftZero. Use this to discover what resources are available before loading them.',
         inputSchema: {
             type: z.enum(['all', 'agents', 'skills', 'rules']).optional().default('all')
         },
@@ -119,7 +119,7 @@ server.registerTool(
 server.registerTool(
     'load_resource',
     {
-        title: 'Load SwiftAgent Resource',
+        title: 'Load SwiftZero Resource',
         description: 'Load the full content of a specific agent, skill, or rule by name. Use list_resources first to see available options.',
         inputSchema: {
             resourceType: z.enum(['agent', 'skill', 'rule']),
@@ -169,9 +169,9 @@ server.registerTool(
 // Search across all agents, skills, and rules by keyword
 // ============================================================================
 server.registerTool(
-    'search_swiftagent',
+    'search_swift-zero',
     {
-        title: 'Search SwiftAgent',
+        title: 'Search SwiftZero',
         description: 'Search for agents, skills, or rules containing a keyword. Searches file names and content.',
         inputSchema: {
             query: z.string().describe('Keyword to search for')
@@ -351,7 +351,7 @@ server.registerTool(
                     const json = JSON.parse(line);
                     if (json.type === 'match') {
                         matches.push({
-                            file: json.data.path.text.replace(workspaceRoot + '/', ''),
+                            file: json.data.path.text.replace(SWIFTZERO_ROOT + '/', ''),
                             line: json.data.line_number,
                             content: json.data.lines.text.trim().slice(0, 200)
                         });

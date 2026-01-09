@@ -1,156 +1,108 @@
-# SwiftAgent
+# SwiftZero
 
 [![License](https://img.shields.io/badge/license-MIT-green)](#) [![Platform](https://img.shields.io/badge/platform-iOS%2026%2B%20%7C%20macOS-blue)](#)
 
-> AI-powered agents for modern Swift/SwiftUI development with GitHub Copilot
+> The Universal AI Engineering Agent for Modern Swift/SwiftUI
 
-A specialized AI toolkit for building professional iOS/macOS features with modern Swift 6.2, TCA (The Composable Architecture), and SwiftUI. This plugin provides ultra-specialized agents that orchestrate planning, implementation, testing, and deployment.
+SwiftZero is a comprehensive **Model Context Protocol (MCP) Server** that turns any AI editor (Cursor, Claude Desktop, Antigravity) into a senior iOS Engineer.
 
-## Swift Engineering Plugin
+It orchestrates **12+ specialized agents**, gives them access to **19+ engineering tools**, and bridges **Apple Documentation** directly into the context window to prevent hallucinations.
 
-The **swift-engineering plugin** is a production-ready toolkit for professional Swift development:
+## ✨ Core Capabilities
 
-- **12 Ultra-Specialized Agents** — Planning, implementation, utilities with clear handoffs
-- **TCA Support** — Full workflow from architecture design to testing for The Composable Architecture
-- **Modern Swift 6.2** — iOS 26+ with strict concurrency, async/await, actors, Sendable
-- **Code Quality** — Integrated code review, accessibility compliance, and performance checks
-- **Knowledge Skills** — 18 specialized knowledge bases covering architecture patterns, frameworks, design, and development tools
+- **Universal Compatibility**: Works in Cursor, Claude Desktop, VS Code, and any MCP client.
+- **Orchestrated Workflow**: The `@swift-lead` agent manages a team of specialized sub-agents (Architect, Engineer, Test Creator).
+- **Integrated Toolchain**: Agents can build, test, lint, format, and boot simulators autonomously.
+- **Apple Intelligence**: Connecting with the `sosumi` MCP server for instant access to 2025+ Apple Docs.
+- **TCA First**: Native support for The Composable Architecture (v1.17+) and modern Swift 6.2 concurrency.
 
-## Quick Start
+---
 
-### Installation for GitHub Copilot (Xcode)
+## 🚀 Quick Start
 
-Copy the `.github/` folder to your Swift project:
+### 1. Install & Build
 
-```bash
-# Copy agents and skills to your project
-cp -r .github/agents /path/to/your/project/.github/
-cp -r .github/skills /path/to/your/project/.github/
-cp .github/copilot-instructions.md /path/to/your/project/.github/
-```
-
-Then open your project in Xcode — agents will appear in the Copilot GUI.
-
-### MCP Server (Recommended)
-
-The **SwiftAgent MCP Server** provides universal access to all agents, skills, and tools from any MCP-compatible IDE (Cursor, Claude Desktop, VS Code, etc.).
+The server is written in TypeScript and runs locally.
 
 ```bash
-# 1. Install and build the MCP server
-cd mcp-server && npm install && npm run build
+cd mcp-server
+npm install
+npm run build
 ```
 
-**For Cursor / Claude Desktop**, add to your MCP config (`~/Library/Application Support/Claude/claude_desktop_config.json` or Cursor settings):
+### 2. Configure Your IDE
+
+Add the following to your MCP configuration file (e.g., `~/.cursor/mcp.json` or `claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
-    "swift-agent": {
+    "sosumi": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://sosumi.ai/mcp"]
+    },
+    "swift-zero": {
       "command": "node",
-      "args": ["/path/to/swift-agent/mcp-server/dist/index.js"]
+      "args": ["/ABSOLUTE/PATH/TO/swift-zero/mcp-server/dist/index.js"]
     }
   }
 }
 ```
 
-**Available Tools:**
+### 3. Start Coding
 
-- `list_resources` — List all agents, skills, and rules
-- `load_resource` — Load a specific agent, skill, or rule by name
-- `search_swiftagent` — Search across all SwiftAgent resources
-- `get_simulator` — Get the best iOS Simulator UDID
-- `search_codebase` — Search code with ripgrep
+Open your project and ask:
 
-**Available Prompts:**
-All 12 agents are exposed as MCP prompts. Use `@swift-architect`, `@tca-engineer`, etc.
-
-### Static Installation (GitHub Copilot)
-
-For Copilot-only workflows, copy files directly:
-
-## What's Included
-
-### 12 Specialized Agents
-
-| Type               | Agents                                                                                                                                      | Responsibility                     |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| **Planning**       | @swift-ui-design, @swift-architect, @tca-architect                                                                                          | Architecture decisions (read-only) |
-| **Implementation** | @tca-engineer, @swift-engineer, @swiftui-specialist, @swift-test-creator, @documentation-generator, @swift-code-reviewer, @swift-modernizer | Code creation and review           |
-| **Utilities**      | @swift-documenter, @search                                                                                                                  | API documentation and code search  |
-
-### 18 Knowledge Skills
-
-Architecture patterns (TCA, SwiftUI, modern Swift, advanced gestures), frameworks (SQLite, GRDB, StoreKit, networking), platform design (iOS 26, HIG, localization, haptics), and development tools (testing, style, diagnostics). Each skill provides deep guidance on modern patterns and best practices.
-
-## For Contributors
-
-### Repository Structure
-
-```
-swift-agent/
-├── .github/
-│   ├── agents/                         # 12 Copilot agents
-│   ├── skills/                         # 17 knowledge skills
-│   ├── prompts/                        # Session management prompts
-│   └── copilot-instructions.md         # Global instructions
-├── mcp-server/                         # MCP Server (TypeScript)
-│   ├── src/index.ts                    # Server entry point
-│   ├── package.json                    # npm configuration
-│   └── dist/                           # Compiled output
-├── mcp/                                # MCP development resources (internal)
-├── rules/                              # Development rules & patterns
-├── scripts/                            # Automation scripts
-├── VERSION                             # Project version
-├── LICENSE                             # MIT License
-└── README.md                           # Documentation
-```
-
-### Development Workflow
-
-#### Bumping Version
-
-When making changes, increment the version:
-
-```bash
-bash scripts/bump-plugin-version.sh <new-version>
-```
-
-#### Adding Agents or Skills
-
-1. Create new agent or skill file in `.github/agents/` or `.github/skills/`
-2. Update references in `copilot-instructions.md` if necessary
-3. Test in Xcode with Copilot
-
-### Code Organization
-
-- **Agents** (`.github/agents/`) — Each agent has a `.md` file with metadata and instructions
-- **Skills** (`.github/skills/`) — Knowledge resources agents reference, organized by topic
-- **Rules** (`rules/`) — Development practices and decision-making frameworks
-- **Scripts** (`scripts/`) — Utility shell scripts for automation
-
-## Architecture & Design Principles
-
-The plugin implements several key principles:
-
-- **Ultra-Specialization** — Each agent has one clear responsibility with defined handoffs
-- **Local-First** — Default to SQLite and UserDefaults, never SwiftData or Core Data
-- **Modern Swift Only** — Swift 6.2 with strict concurrency, no deprecated APIs
-- **Read-Only Planning** — Planning agents cannot modify code, ensuring clear separation
-- **Plan File Coordination** — Agents share state via `docs/plans/<feature>.md`
-
-See [README.md](README.md) for architecture details, workflow diagrams, and handoff models.
-
-## License
-
-MIT License — See [LICENSE](LICENSE) file for details.
-
-## Credits
-
-**Author:** John Rogers
-**Repository:** swift-agent
-**Swift Version:** 6.2+
-**iOS Deployment Target:** 26.0+
+> "Act as @swift-lead. I need to build a new feature for..."
 
 ---
 
-For detailed documentation, agent specifications, and usage examples, see the [Agents docs](.github/agents/README.md).
+## 🛠️ The Agent Team
+
+SwiftZero deploys a squad of specialists to your codebase:
+
+| Agent                    | Proficiency                                             |
+| ------------------------ | ------------------------------------------------------- |
+| **@swift-lead**          | The Staff Engineer. Research, planning, and delegation. |
+| **@swift-architect**     | High-level system design and decision making.           |
+| **@tca-architect**       | TCA state/action modeling and reducer hierarchies.      |
+| **@tca-engineer**        | Implementing reducers, effects, and dependencies.       |
+| **@swiftui-specialist**  | Pure UI implementation (Views, Previews, Animations).   |
+| **@swift-test-creator**  | Writing comprehensive Swift Testing suites.             |
+| **@swift-code-reviewer** | Security, performance, and HIG compliance checks.       |
+
+## 🧬 Knowledge Skills
+
+The agents have access to 18+ knowledge bases in `.github/skills/`, covering:
+
+- **Frameworks**: SQLite, GRDB, StoreKit 2, Network.framework
+- **Patterns**: Modern Concurrency, TCA, Advanced SwiftUI
+- **Platform**: iOS 26+ APIs, Human Interface Guidelines
+
+## 🤖 Tools Available
+
+Agents can autonomously run:
+
+- `run_swift_build` / `run_swift_tests`
+- `open_simulator` / `install_app`
+- `run_swiftlint` / `run_swift_format`
+- `search_apple_docs` (via Sosumi)
+- `create_plan` / `update_plan_status`
+
+---
+
+## Architecture & Design Principles
+
+- **Ultra-Specialization**: One agent, one job.
+- **Local-First**: Default to SQLite/UserDefaults. No servers unless needed.
+- **Strict Concurrency**: Swift 6.2 `Sendable` everywhere.
+- **Plan-Driven**: All work is tracked in `docs/plans/<feature>.md`.
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+**SwiftZero** — Build better apps, faster.
