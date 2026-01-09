@@ -1,6 +1,15 @@
 {
     "sosumi": {
-      "type": "http",
-      "url": "https://sosumi.ai/mcp"
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://sosumi.ai/mcp"
+      ]
+    },
+    "swift-agent": {
+      "command": "node",
+      "args": ["/Users/zero/Apps/claude-swift-engineering/mcp-server/dist/index.js"]
     }
 }
